@@ -18,7 +18,7 @@ services:
       - REDIS_DB=2
       - OPT_STORES_PER_UPDATE=300
       - OPT_SLEEP_SECONDS=0.1
-      - LOGLEVEL=WARN
+      - LOGLEVEL=INFO
 
   tlu:
     container_name: tlu
@@ -32,3 +32,4 @@ services:
       - REDIS_HOST=redis
       - REDIS_DB=2
       - LOGLEVEL=INFO
+      - OPT_MISSING_THRESHOLD=150
