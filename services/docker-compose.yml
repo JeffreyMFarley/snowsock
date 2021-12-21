@@ -16,3 +16,19 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_DB=2
+      - OPT_STORES_PER_UPDATE=300
+      - OPT_SLEEP_SECONDS=0.1
+      - LOGLEVEL=WARN
+
+  tlu:
+    container_name: tlu
+    image: tlu:latest
+    build:
+      context: ./tlu
+    depends_on:
+      - redis
+      - store_upload
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_DB=2
+      - LOGLEVEL=INFO
