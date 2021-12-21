@@ -5,3 +5,14 @@ services:
     image: redis:6.2.6
     ports:
       - "6379:6379"
+
+  store_upload:
+    container_name: store_upload
+    image: store_upload:latest
+    build:
+      context: ./store_upload
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_DB=2
