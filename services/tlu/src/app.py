@@ -1,3 +1,7 @@
+import newrelic.agent as nr
+nr.initialize()
+nr_app = nr.register_application('snowsock', timeout=10.0)
+
 import heapq
 import logging
 import multiprocessing as mp
@@ -25,6 +29,7 @@ def parse_command(s):
 # ------------------------------------------------------
 # Listen thread
 
+@nr.background_task(nr_app)
 def monitor(redis_conn, stores):
     with redis_conn.monitor() as m:
         for command in m.listen():
@@ -38,6 +43,7 @@ def monitor(redis_conn, stores):
 # ------------------------------------------------------
 # Maintain missing thread
 
+@nr.background_task(nr_app)
 def run_check(stores, missing):
     while True:
         sleep(OPT_MISSING_THRESHOLD >> 2)
@@ -81,7 +87,7 @@ def main():
         proc_monitor.start()
 
         missing = manager.dict()
-        
+
         proc_missing = mp.Process(target=run_check, args=(stores, missing))
         proc_missing.start()
 
@@ -96,7 +102,14 @@ def main():
                     lu = datetime.utcfromtimestamp(stamp)
                     delta = now - lu
                     secs = delta.total_seconds()
-                    logger.warning(f'Store {store} has not responded in {secs:3.1f} seconds')
+                    logger.warning(
+                        f'Store {store} has not responded in {secs:3.1f} seconds'
+                    )
+                    nr.record_custom_event(
+                        'FOE_Offline',
+                        { 'store': store },
+                        application=nr_app
+                    )
 
         proc_monitor.join()
         proc_missing.join()

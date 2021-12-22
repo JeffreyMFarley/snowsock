@@ -28,8 +28,12 @@ services:
     depends_on:
       - redis
       - store_upload
+    env_file:
+      - ./.env
     environment:
       - REDIS_HOST=redis
       - REDIS_DB=2
       - LOGLEVEL=INFO
       - OPT_MISSING_THRESHOLD=150
+      - NEW_RELIC_APP_NAME=snowsock
+      - NEW_RELIC_LOG=stdout

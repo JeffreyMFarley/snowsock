@@ -11,6 +11,10 @@ FROM python:${RUNTIME_VERSION}-slim-buster AS python-base
 RUN apt-get install \
     libstdc++
 
+RUN pip install --no-cache-dir newrelic
+
+ENTRYPOINT ["newrelic-admin", "run-program"]
+
 # --------------------------------------------------------------------------------
 # Stage 2 - build function and dependencies
 
@@ -43,4 +47,4 @@ COPY --from=build-image ${FUNCTION_DIR} ${FUNCTION_DIR}
 COPY entry.sh /
 RUN chmod 755 /entry.sh
 
-ENTRYPOINT [ "/entry.sh" ]
+CMD [ "/entry.sh" ]
